@@ -152,5 +152,74 @@ int main(int, char**)
 #endif
     }
 
+
+#if defined(_LIBCPP_VERSION) && !defined(TEST_HAS_NO_EXCEPTIONS)
+    {
+        std::future<int> f;
+        try {
+            f.get();
+            assert(false);
+        } catch (const std::future_error& e) {
+            assert(e.code() == std::make_error_code(std::future_errc::no_state));
+        }
+    }
+    {
+        std::promise<int> p;
+        std::future<int> f = p.get_future();
+        p.set_value(3);
+        f.get();
+        try {
+            f.get();
+            assert(false);
+        } catch (const std::future_error& e) {
+            assert(e.code() == std::make_error_code(std::future_errc::no_state));
+        }
+    }
+    {
+        std::future<int&> f;
+        try {
+            f.get();
+            assert(false);
+        } catch (const std::future_error& e) {
+            assert(e.code() == std::make_error_code(std::future_errc::no_state));
+        }
+    }
+    {
+        std::promise<int&> p;
+        std::future<int&> f = p.get_future();
+        int j = 5;
+        p.set_value(j);
+        f.get();
+        try {
+            f.get();
+            assert(false);
+        } catch (const std::future_error& e) {
+            assert(e.code() == std::make_error_code(std::future_errc::no_state));
+        }
+    }
+    {
+        std::future<void> f;
+        try {
+            f.get();
+            assert(false);
+        } catch (const std::future_error& e) {
+            assert(e.code() == std::make_error_code(std::future_errc::no_state));
+        }
+    }
+    {
+        std::promise<void> p;
+        std::future<void> f = p.get_future();
+        p.set_value();
+        f.get();
+        try {
+            f.get();
+            assert(false);
+        } catch (const std::future_error& e) {
+            assert(e.code() == std::make_error_code(std::future_errc::no_state));
+        }
+    }
+#endif
+
   return 0;
 }
+
